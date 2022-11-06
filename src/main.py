@@ -64,31 +64,34 @@ def rename_manga_pages_a(path_to_manga, num_ch):
     """
     # For each manga volume:
     for vol_name in os.listdir(path_to_manga):
-        # Get the path to the volume.
-        path_to_vol = os.path.join(path_to_manga, vol_name)
-        # For each chapter in the volume:
-        for ch_name in os.listdir(path_to_vol):
-            # Get the chapter info.
-            ch_num, ch_ext = get_chapter_info(ch_name, num_ch)
-            # Get the path to the chapter.
-            path_to_ch = os.path.join(path_to_vol, ch_name)
-            # For each file in the chapter:
-            for file in os.listdir(path_to_ch):
-                # If the file is an image file:
-                if not file.lower().endswith(".nomedia"):
-                    # Get the current path of the page.
-                    curr_page_path = os.path.join(path_to_ch, file)
-                    # Get the new file name for the page.
-                    if ch_ext is None:
-                        page_name = f"{ch_num}{file}"
+        # Ignore the Manga Cover directory.
+        if "Volume" in vol_name:
+            # Get the path to the volume.
+            path_to_vol = os.path.join(path_to_manga, vol_name)
+            # For each chapter in the volume:
+            for ch_name in os.listdir(path_to_vol):
+                # Get the chapter info.
+                ch_num, ch_ext = get_chapter_info(ch_name, num_ch)
+                # Get the path to the chapter.
+                path_to_ch = os.path.join(path_to_vol, ch_name)
+                # For each file in the chapter:
+                for file in os.listdir(path_to_ch):
+                    # If the file is an image file:
+                    if not file.lower().endswith(".nomedia"):
+                        # Get the current path of the page.
+                        curr_page_path = os.path.join(path_to_ch, file)
+                        # Get the new file name for the page.
+                        if ch_ext is None:
+                            page_name = f"{ch_num}{file}"
+                            pass
+                        else:
+                            page_name = f"{ch_num}{ch_ext}{file[1:]}"
+                            pass
+                        # Create the path to the renamed page.
+                        new_page_path = os.path.join(path_to_ch, page_name)
+                        # Rename the page.
+                        os.rename(curr_page_path, new_page_path)
                         pass
-                    else:
-                        page_name = f"{ch_num}{ch_ext}{file[1:]}"
-                        pass
-                    # Create the path to the renamed page.
-                    new_page_path = os.path.join(path_to_ch, page_name)
-                    # Rename the page.
-                    os.rename(curr_page_path, new_page_path)
                     pass
                 pass
             pass
@@ -105,26 +108,29 @@ def move_manga_pages(path_to_manga):
     """
     # For each manga volume:
     for vol_name in os.listdir(path_to_manga):
-        # Get the path to the volume.
-        path_to_vol = os.path.join(path_to_manga, vol_name)
-        # For each chapter in the volume:
-        for ch_name in os.listdir(path_to_vol):
-            # Get the path to the chapter.
-            path_to_ch = os.path.join(path_to_vol, ch_name)
-            # For each file in the chapter:
-            for file in os.listdir(path_to_ch):
-                # If the file is an image file:
-                if not file.lower().endswith(".nomedia"):
-                    # Get the current path to the page.
-                    curr_path_to_page = os.path.join(path_to_ch, file)
-                    # Create the path to move the page in.
-                    new_path_to_page = os.path.join(path_to_vol, file)
-                    # Move the file to its corresponding volume directory.
-                    os.rename(curr_path_to_page, new_path_to_page)
+        # Ignore the Manga Cover directory.
+        if "Volume" in vol_name:
+            # Get the path to the volume.
+            path_to_vol = os.path.join(path_to_manga, vol_name)
+            # For each chapter in the volume:
+            for ch_name in os.listdir(path_to_vol):
+                # Get the path to the chapter.
+                path_to_ch = os.path.join(path_to_vol, ch_name)
+                # For each file in the chapter:
+                for file in os.listdir(path_to_ch):
+                    # If the file is an image file:
+                    if not file.lower().endswith(".nomedia"):
+                        # Get the current path to the page.
+                        curr_path_to_page = os.path.join(path_to_ch, file)
+                        # Create the path to move the page in.
+                        new_path_to_page = os.path.join(path_to_vol, file)
+                        # Move the file to its corresponding volume directory.
+                        os.rename(curr_path_to_page, new_path_to_page)
+                        pass
                     pass
+                # Delete the empty chapter directory.
+                shutil.rmtree(path_to_ch)
                 pass
-            # Delete the empty chapter directory.
-            shutil.rmtree(path_to_ch)
             pass
         pass
     pass
@@ -139,23 +145,26 @@ def rename_manga_pages_b(path_to_manga):
     """
     # For each manga volume:
     for vol_name in os.listdir(path_to_manga):
-        # Get the path to the volume.
-        path_to_vol = os.path.join(path_to_manga, vol_name)
-        # Get the number of pages in the manga.
-        n = len(os.listdir(path_to_vol))
-        # For each page in the volume:
-        for i, page_name in enumerate(os.listdir(path_to_vol), start=1):
-            # Get the path to the page.
-            path_to_page_curr = os.path.join(path_to_vol, page_name)
-            # Get the file extension.
-            file_extension = page_name.split(".")[1]
-            # Create the name for the page.
-            zeros = "0" * get_num_zeroes(n, i)
-            new_page_name = f"{zeros}{i}.{file_extension}"
-            # Create the path for the page with the new file name.
-            path_to_page_new = os.path.join(path_to_vol, new_page_name)
-            # Rename the file.
-            os.rename(path_to_page_curr, path_to_page_new)
+        # Ignore the Manga Cover directory.
+        if "Volume" in vol_name:
+            # Get the path to the volume.
+            path_to_vol = os.path.join(path_to_manga, vol_name)
+            # Get the number of pages in the manga.
+            n = len(os.listdir(path_to_vol))
+            # For each page in the volume:
+            for i, page_name in enumerate(os.listdir(path_to_vol), start=1):
+                # Get the path to the page.
+                path_to_page_curr = os.path.join(path_to_vol, page_name)
+                # Get the file extension.
+                file_extension = page_name.split(".")[1]
+                # Create the name for the page.
+                zeros = "0" * get_num_zeroes(n, i)
+                new_page_name = f"{zeros}{i}.{file_extension}"
+                # Create the path for the page with the new file name.
+                path_to_page_new = os.path.join(path_to_vol, new_page_name)
+                # Rename the file.
+                os.rename(path_to_page_curr, path_to_page_new)
+                pass
             pass
         pass
     pass
@@ -164,14 +173,17 @@ def rename_manga_pages_b(path_to_manga):
 def convert_vol_directory_to_cbz(path_to_manga):
     # For each volume in the manga:
     for vol_name in os.listdir(path_to_manga):
-        # Get the path to the volume.
-        path_to_vol = os.path.join(path_to_manga, vol_name)
-        # Zip the volume directory.
-        shutil.make_archive(path_to_vol, "zip", root_dir=path_to_vol)
-        # Convert the zip file to a cbz file.
-        os.rename(f"{path_to_vol}.zip", f"{path_to_vol}.cbz")
-        # Delete the original directory.
-        shutil.rmtree(path_to_vol)
+        # Ignore the Manga Cover directory.
+        if "Volume" in vol_name:
+            # Get the path to the volume.
+            path_to_vol = os.path.join(path_to_manga, vol_name)
+            # Zip the volume directory.
+            shutil.make_archive(path_to_vol, "zip", root_dir=path_to_vol)
+            # Convert the zip file to a cbz file.
+            os.rename(f"{path_to_vol}.zip", f"{path_to_vol}.cbz")
+            # Delete the original directory.
+            shutil.rmtree(path_to_vol)
+            pass
         pass
     pass
 
