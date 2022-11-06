@@ -68,21 +68,24 @@ def rename_manga_pages_a(path_to_manga, num_ch):
             ch_num, ch_ext = get_chapter_info(ch_name, num_ch)
             # Get the path to the chapter.
             path_to_ch = os.path.join(path_to_vol, ch_name)
-            # For each page in the chapter:
-            for page in os.listdir(path_to_ch):
-                # Get the current path of the page.
-                curr_page_path = os.path.join(path_to_ch, page)
-                # Get the new file name for the page.
-                if ch_ext is None:
-                    page_name = f"{ch_num}{page}"
+            # For each file in the chapter:
+            for file in os.listdir(path_to_ch):
+                # If the file is an image file:
+                if not file.lower().endswith(".nomedia"):
+                    # Get the current path of the page.
+                    curr_page_path = os.path.join(path_to_ch, file)
+                    # Get the new file name for the page.
+                    if ch_ext is None:
+                        page_name = f"{ch_num}{file}"
+                        pass
+                    else:
+                        page_name = f"{ch_num}{ch_ext}{file[1:]}"
+                        pass
+                    # Create the path to the renamed page.
+                    new_page_path = os.path.join(path_to_ch, page_name)
+                    # Rename the page.
+                    os.rename(curr_page_path, new_page_path)
                     pass
-                else:
-                    page_name = f"{ch_num}{ch_ext}{page[1:]}"
-                    pass
-                # Create the path to the renamed page.
-                new_page_path = os.path.join(path_to_ch, page_name)
-                # Rename the page.
-                os.rename(curr_page_path, new_page_path)
                 pass
             pass
         pass
