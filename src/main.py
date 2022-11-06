@@ -16,7 +16,11 @@ def get_num_zeroes(total, current):
     :param total: Total number of volumes or chapters in the manga.
     :param current: Current volume or chapter number.
     """
-    return math.floor(math.log10(total)) - math.floor(math.log10(current))
+    if current == 0:
+        return math.floor(math.log10(total))
+    else:
+        return math.floor(math.log10(total)) - math.floor(math.log10(current))
+    pass
 
 
 def get_path_to_manga():
@@ -25,7 +29,7 @@ def get_path_to_manga():
     for e in lst[1:]:
         path_to_manga += f" {e}"
         pass
-    return path_to_manga
+    return f"{path_to_manga}\\New folder"
 
 
 def generate_volumes(path_to_manga, n):
@@ -107,14 +111,17 @@ def move_manga_pages(path_to_manga):
         for ch_name in os.listdir(path_to_vol):
             # Get the path to the chapter.
             path_to_ch = os.path.join(path_to_vol, ch_name)
-            # For each page in the chapter:
-            for page_name in os.listdir(path_to_ch):
-                # Get the current path to the page.
-                curr_path_to_page = os.path.join(path_to_ch, page_name)
-                # Create the path to move the page in.
-                new_path_to_page = os.path.join(path_to_vol, page_name)
-                # Move the file to its corresponding volume directory.
-                os.rename(curr_path_to_page, new_path_to_page)
+            # For each file in the chapter:
+            for file in os.listdir(path_to_ch):
+                # If the file is an image file:
+                if not file.lower().endswith(".nomedia"):
+                    # Get the current path to the page.
+                    curr_path_to_page = os.path.join(path_to_ch, file)
+                    # Create the path to move the page in.
+                    new_path_to_page = os.path.join(path_to_vol, file)
+                    # Move the file to its corresponding volume directory.
+                    os.rename(curr_path_to_page, new_path_to_page)
+                    pass
                 pass
             # Delete the empty chapter directory.
             shutil.rmtree(path_to_ch)
@@ -189,16 +196,16 @@ def get_chapter_info(chapter_name, num_ch):
 
 
 def main():
-    num_of_vol = 11
-    num_of_ch = 107
+    num_of_vol = 1
+    num_of_ch = 8
     path_to_manga = get_path_to_manga()
 
     # generate_volumes(path_to_manga, num_of_vol)
 
-    # rename_manga_pages_a(path_to_manga, num_of_ch)
-    # move_manga_pages(path_to_manga)
-    # rename_manga_pages_b(path_to_manga)
-    # convert_vol_directory_to_cbz(path_to_manga)
+    rename_manga_pages_a(path_to_manga, num_of_ch)
+    move_manga_pages(path_to_manga)
+    rename_manga_pages_b(path_to_manga)
+    convert_vol_directory_to_cbz(path_to_manga)
 
     path_to_database_sqlite = "C:\\Users\\rayla\\.komga\\database.sqlite"
     new_path = "C:\\Users\\rayla\\Desktop\\Raylas_Manga_Collection\\" \
