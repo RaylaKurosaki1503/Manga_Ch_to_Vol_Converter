@@ -10,17 +10,17 @@ import shutil
 import sys
 
 
-def get_num_zeroes(total, current):
+def get_num_zeros(total_num, current_num):
     """
 
-    :param total: Total number of volumes or chapters in the manga.
-    :param current: Current volume or chapter number.
+    :param total_num: Total number of volumes or chapters in the manga.
+    :param current_num: Current volume or chapter number.
     """
-    if current == 0:
-        return math.floor(math.log10(total))
-    else:
-        return math.floor(math.log10(total)) - math.floor(math.log10(current))
-    pass
+    num_of_zeros = math.floor(math.log10(total_num))
+    if current_num > 0:
+        num_of_zeros -= math.floor(math.log10(current_num))
+        pass
+    return num_of_zeros
 
 
 def get_path_to_manga():
@@ -29,38 +29,39 @@ def get_path_to_manga():
     for e in lst[1:]:
         path_to_manga += f" {e}"
         pass
-    return f"{path_to_manga}\\New folder"
+    return path_to_manga
 
 
-def generate_volumes(path_to_manga, n):
+def generate_vol_dir(path_to_manga, num_of_vol):
     """
-    This function creates folders named "Volume X" for n volumes.
+    This function creates volume directories.
 
     :param path_to_manga: The path to the manga.
-    :param n: Number of volumes in the manga.
+    :param num_of_vol: Number of volumes in the manga.
     """
-    # For n manga volumes:
-    for i in range(n):
+    # For num_of_vol manga volumes:
+    for i in range(num_of_vol):
         # Create the name of the volume directory.
-        zeros = "0" * get_num_zeroes(n, i + 1)
+        zeros = "0" * get_num_zeros(num_of_vol, i + 1)
         name_of_dir = f"Volume {zeros}{i + 1}"
         # Create the path to the directory.
         path_to_volume = os.path.join(path_to_manga, name_of_dir)
-        # Create the directory if it does not already exist.
+        # If the path to the directory does not exist:
         if not os.path.exists(path_to_volume):
+            # Create the directory.
             os.makedirs(path_to_volume)
             pass
         pass
     pass
 
 
-def rename_manga_pages_a(path_to_manga, num_ch):
+def rename_manga_pages_a(path_to_manga, num_of_ch):
     """
     This function renames all the pages in the manga in the format
     "{chapter_num}{file_name}".
 
     :param path_to_manga: The path to the manga.
-    :param num_ch: The number of chapters in the manga.
+    :param num_of_ch: The number of chapters in the manga.
     """
     # For each manga volume:
     for vol_name in os.listdir(path_to_manga):
@@ -71,7 +72,7 @@ def rename_manga_pages_a(path_to_manga, num_ch):
             # For each chapter in the volume:
             for ch_name in os.listdir(path_to_vol):
                 # Get the chapter info.
-                ch_num, ch_ext = get_chapter_info(ch_name, num_ch)
+                ch_num, ch_ext = get_chapter_info(ch_name, num_of_ch)
                 # Get the path to the chapter.
                 path_to_ch = os.path.join(path_to_vol, ch_name)
                 # For each file in the chapter:
@@ -150,7 +151,7 @@ def rename_manga_pages_b(path_to_manga):
             # Get the path to the volume.
             path_to_vol = os.path.join(path_to_manga, vol_name)
             # Get the number of pages in the manga.
-            n = len(os.listdir(path_to_vol))
+            num_of_pages = len(os.listdir(path_to_vol))
             # For each page in the volume:
             for i, page_name in enumerate(os.listdir(path_to_vol), start=1):
                 # Get the path to the page.
@@ -158,7 +159,7 @@ def rename_manga_pages_b(path_to_manga):
                 # Get the file extension.
                 file_extension = page_name.split(".")[1]
                 # Create the name for the page.
-                zeros = "0" * get_num_zeroes(n, i)
+                zeros = "0" * get_num_zeros(num_of_pages, i)
                 new_page_name = f"{zeros}{i}.{file_extension}"
                 # Create the path for the page with the new file name.
                 path_to_page_new = os.path.join(path_to_vol, new_page_name)
@@ -188,36 +189,46 @@ def convert_vol_directory_to_cbz(path_to_manga):
     pass
 
 
-def get_chapter_info(chapter_name, num_ch):
+def get_cover_number(filename):
+    return int((filename.split(".")[0]).split("_")[-1])
+
+
+def get_chapter_info(chapter_name, num_of_ch):
     """
     A function to extract the chapter number from the directory title.
 
     :param chapter_name: The name of the chapter.
-    :param num_ch: Number of chapters in the manga.
+    :param num_of_ch: Number of chapters in the manga.
     """
-    lst_chapter = chapter_name.split(" ")
-    chapter_number = lst_chapter[1].split(".")
-    a = int(chapter_number[0])
-    zeroes = "0" * get_num_zeroes(num_ch, int(a))
-    a = f"{zeroes}{a}"
+    lst_chapter = chapter_name.split(" ")[1].split(".")
+    a = int(lst_chapter[0])
+    zeros = "0" * get_num_zeros(num_of_ch, int(a))
+    a = f"{zeros}{a}"
     b = None
-    if len(chapter_number) == 2:
-        b = f"{chapter_number[1]}"
+    if len(lst_chapter) > 1:
+        b = f"{lst_chapter[1]}"
         pass
     return a, b
 
 
 def main():
-    num_of_vol = 1
-    num_of_ch = 8
+    num_of_ch = 141
+    num_of_vol = 34
+
     path_to_manga = get_path_to_manga()
 
-    # generate_volumes(path_to_manga, num_of_vol)
+    chapters_are_sorted = False
+    chapters_are_sorted = True
 
-    rename_manga_pages_a(path_to_manga, num_of_ch)
-    move_manga_pages(path_to_manga)
-    rename_manga_pages_b(path_to_manga)
-    convert_vol_directory_to_cbz(path_to_manga)
+    if chapters_are_sorted:
+        rename_manga_pages_a(path_to_manga, num_of_ch)
+        move_manga_pages(path_to_manga)
+        rename_manga_pages_b(path_to_manga)
+        convert_vol_directory_to_cbz(path_to_manga)
+        pass
+    else:
+        generate_vol_dir(path_to_manga, num_of_vol)
+        pass
 
     path_to_database_sqlite = "C:\\Users\\rayla\\.komga\\database.sqlite"
     new_path = "C:\\Users\\rayla\\Desktop\\Raylas_Manga_Collection\\" \
